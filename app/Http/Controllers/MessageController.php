@@ -8,6 +8,8 @@ use DB;
 use App\Message;
 use App\MessageSend;
 
+
+
 /**
  * 站内消息类
  */
