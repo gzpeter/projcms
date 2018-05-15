@@ -52,6 +52,9 @@ class MessageController extends Controller
  		$offsize = ($page - 1) * $size;
  		
  		$lists = Message::select($field)->offset($offsize)->limit($size)->orderBy('id','desc')->get();
+ 		foreach ($lists as $key => $value) {
+ 			$lists[$key]['created_at'] = date('Y-m-d H:i:s',$value['created_at']);
+ 		}
  		$count = Message::count();
  		$pages = ceil($count/$size);
  		$ret['data']['pages'] = $pages;
