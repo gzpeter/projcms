@@ -105,7 +105,7 @@ class ArticleController extends Controller
  			]
  		];
  		//检测需要的参数是否传递
- 		$param = ['user_id','token','article_id'];
+ 		$param = ['user_id','token','article_id','status'];
  		foreach ($param as $key => $value) {
  			if(!$request->input($value)){
  				$ret['status'] = -1;
@@ -117,6 +117,7 @@ class ArticleController extends Controller
  		$user_id = $request->input('user_id');
  		$token = $request->input('token');
  		$article_id = $request->input('article_id');
+ 		$status = $request->input('status',1);
 
  		$field = ['id','type','status','title','author','read_num','collect_num','last_update_time'];
  		$info = Article::select($field)->find($article_id);
@@ -129,6 +130,9 @@ class ArticleController extends Controller
  		$lists = Article::find($article_id)->segmentList; 
  		$ret['data']['info'] = $info;
  		$ret['data']['lists'] = $lists;
+ 		if($status == 1){
+ 			Article::where('id','=',$article_id)->increment('read_num',1);
+ 		}
  		return $ret;
 	}
 

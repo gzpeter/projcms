@@ -28,7 +28,7 @@ Route::post('article/add','ArticleController@add');
 Route::post('article/edit','ArticleController@edit');
 Route::post('article/down_or_online','ArticleController@updateStatus');
 
-
-
-
-
+//收藏模块
+Route::post('collection/list','CollectionController@lists');
+Route::post('collection/add','CollectionController@add');
+Route::post('collection/delete','CollectionController@delete');
