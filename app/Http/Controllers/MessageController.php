@@ -25,6 +25,7 @@ class MessageController extends Controller
  			'status' => 0,
  			'msg' => '查询成功！',
  			'data' =>[
+ 				'pages' => 0,
  				'lists' => [],
  			]
  		];
@@ -46,10 +47,14 @@ class MessageController extends Controller
  			['message_send.user_id','=',$user_id]
  		];*/
  		//需要查询的列
- 		$field = ['id','title','msender','created_at',];
+ 		$field = ['id','title','sender','created_at'];
  		$size = 10;
  		$offsize = ($page - 1) * $size;
+ 		
  		$lists = Message::select($field)->offset($offsize)->limit($size)->orderBy('id','desc')->get();
+ 		$count = Message::count();
+ 		$pages = ceil($count/$size);
+ 		$ret['data']['pages'] = $pages;
  		$ret['data']['lists'] = $lists;
  		return $ret;
  	}
