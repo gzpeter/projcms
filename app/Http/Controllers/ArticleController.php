@@ -630,6 +630,11 @@ class ArticleController extends Controller{
 			}else{
 				DB::table('segment')->where('article_id',$article_id)->delete();
 			}
+			$up_data['user_id'] = $user_id;
+			$up_data['article_id'] = $article_id;
+			$up_data['last_update_time'] = $time;
+			$up_data['created_at'] = $time;
+			DB::table('update_istory')->insertGetId($up_data);
 			DB::commit();
 		} catch (\Exception $e) {
 			DB::rollBack();
