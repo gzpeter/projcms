@@ -14,10 +14,93 @@ use App\Article;
 class CollectionController extends Controller{
 
 	/**
-	 * 收藏列表
-	 * @param  Request $request [description]
-	 * @return [type]           [description]
-	 */
+     * @SWG\Post(
+     *     path="/api/collection/list",
+     *     summary="收藏列表",
+     *     produces={"application/json"},
+     *     tags={"Collection"},
+     *     @SWG\Parameter(
+     *         name="user_id",
+     *         type="integer",
+     *         description="用户id",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="token",
+	 *         type="string",
+     *         description="用户token",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+	 *         type="integer",
+     *         description="页数",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Response (
+     *          response="200",
+     *          description="查询成功！",
+     *          @SWG\Schema(
+	 *              @SWG\Property(
+	 *                  property="status",
+	 *                  type="number",
+	 *                  description="状态码"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="msg",
+	 *                  type="string",
+	 *                  description="提示信息"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="data",
+	 *                  type="object",
+	 *                  @SWG\Property(
+	 *                  	property="lists",
+	 *                  	type="object",
+	 *                  	@SWG\Property(
+     *                  	    property="id",
+     *                    	    type="number",
+     *                    	    description="文章ID"
+     *                      ),
+     *                 	    @SWG\Property(
+     *                 	    	property="title",
+     *                       	type="string",
+     *                       	description="文章标题"
+     *                 	    ),
+     *                 	    @SWG\Property(
+     *                 	    	property="author",
+     *                       	type="string",
+     *                       	description="文章作者"
+     *                 	    ),
+     *                 	    @SWG\Property(
+     *                 	    	property="read_num",
+     *                       	type="number",
+     *                       	description="文章阅读数"
+     *                 	    ),
+     *                 	    @SWG\Property(
+     *                 	    	property="collect_num",
+     *                       	type="number",
+     *                       	description="文章收藏数"
+     *                 	    ),
+     *                 	    @SWG\Property(
+     *                 	    	property="created_at",
+     *                       	type="string",
+     *                       	description="消息发送时间"
+     *                 	    ),
+	 *                  ),
+	 *                  @SWG\Property(
+	 *                  	property="pages",
+	 *                  	type="number",
+	 *                  	description="总页数"
+	 *                  ),
+	 *              ),
+	 *          )
+     *     ),
+     * )
+     */
 	public function lists(Request $request)
 	{
 		//定义返回格式数组
@@ -63,9 +146,54 @@ class CollectionController extends Controller{
 	}
 
 	/**
-	 * 添加收藏
-	 * @param Request $request [description]
-	 */
+     * @SWG\Post(
+     *     path="/api/collection/add",
+     *     summary="添加收藏",
+     *     produces={"application/json"},
+     *     tags={"Collection"},
+     *     @SWG\Parameter(
+     *         name="user_id",
+     *         type="integer",
+     *         description="用户id",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="token",
+	 *         type="string",
+     *         description="用户token",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="article_id",
+	 *         type="integer",
+     *         description="文章ID",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Response (
+     *          response="200",
+     *          description="操作成功！",
+     *          @SWG\Schema(
+	 *              @SWG\Property(
+	 *                  property="status",
+	 *                  type="number",
+	 *                  description="状态码"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="msg",
+	 *                  type="string",
+	 *                  description="提示信息"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="data",
+	 *                  type="string",
+	 *              ),
+	 *          )
+     *     ),
+     * )
+     */
 	public function add(Request $request)
 	{
 		//定义返回格式数组
@@ -118,10 +246,54 @@ class CollectionController extends Controller{
 	}
 
 	/**
-	 * 删除收藏
-	 * @param  Request $request [description]
-	 * @return [type]           [description]
-	 */
+     * @SWG\Post(
+     *     path="/api/collection/delete",
+     *     summary="添加收藏",
+     *     produces={"application/json"},
+     *     tags={"Collection"},
+     *     @SWG\Parameter(
+     *         name="user_id",
+     *         type="integer",
+     *         description="用户id",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="token",
+	 *         type="string",
+     *         description="用户token",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="article_id",
+	 *         type="integer",
+     *         description="文章ID",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Response (
+     *          response="200",
+     *          description="操作成功！",
+     *          @SWG\Schema(
+	 *              @SWG\Property(
+	 *                  property="status",
+	 *                  type="number",
+	 *                  description="状态码"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="msg",
+	 *                  type="string",
+	 *                  description="提示信息"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="data",
+	 *                  type="string",
+	 *              ),
+	 *          )
+     *     ),
+     * )
+     */
 	public function delete(Request $request)
 	{
 		//定义返回格式数组

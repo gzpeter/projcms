@@ -8,16 +8,88 @@ use DB;
 use App\Message;
 use App\MessageSend;
 
-/**
- * 站内消息类
- */
+
 class MessageController extends Controller 
 {
+
 	/**
-	 * 获取站内消息列表
-	 * @param  Request $request [description]
-	 * @return [type]           [description]
-	 */
+     * @SWG\Post(
+     *     path="/api/message/list",
+     *     summary="获取消息列表",
+     *     produces={"application/json"},
+     *     tags={"Message"},
+     *     @SWG\Parameter(
+     *         name="user_id",
+     *         type="integer",
+     *         description="用户id",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="token",
+	 *         type="string",
+     *         description="用户token",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+	 *         type="integer",
+     *         description="页数",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Response (
+     *          response="200",
+     *          description="查询成功！",
+     *          @SWG\Schema(
+	 *              @SWG\Property(
+	 *                  property="status",
+	 *                  type="number",
+	 *                  description="状态码"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="msg",
+	 *                  type="string",
+	 *                  description="提示信息"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="data",
+	 *                  type="object",
+	 *                  @SWG\Property(
+	 *                  	property="lists",
+	 *                  	type="object",
+	 *                  	@SWG\Property(
+     *                  	    property="id",
+     *                    	    type="number",
+     *                    	    description="消息ID"
+     *                      ),
+     *                 	    @SWG\Property(
+     *                 	    	property="title",
+     *                       	type="string",
+     *                       	description="消息标题"
+     *                 	    ),
+     *                 	    @SWG\Property(
+     *                 	    	property="sender",
+     *                       	type="string",
+     *                       	description="消息发送者"
+     *                 	    ),
+     *                 	    @SWG\Property(
+     *                 	    	property="created_at",
+     *                       	type="string",
+     *                       	description="消息发送时间"
+     *                 	    ),
+	 *                  ),
+	 *                  @SWG\Property(
+	 *                  	property="pages",
+	 *                  	type="number",
+	 *                  	description="总页数"
+	 *                  ),
+	 *              ),
+	 *          )
+     *     ),
+     * )
+     */
  	public function lists(Request $request)
  	{	
  		//定义返回格式数组
@@ -35,7 +107,7 @@ class MessageController extends Controller
  			if(!$request->has($value)){
  				$ret['status'] = -1;
  				$ret['msg'] = $value.'参数错误！';
- 				return $ret;
+				return $ret;
  			}
  		}
  		$user_id = $request->input('user_id');
@@ -63,10 +135,79 @@ class MessageController extends Controller
  	}
 
  	/**
- 	 * 获取站内消息内容
- 	 * @param  string $value [description]
- 	 * @return [type]        [description]
- 	 */
+     * @SWG\Post(
+     *     path="/api/message/info",
+     *     summary="获取消息内容",
+     *     produces={"application/json"},
+     *     tags={"Message"},
+     *     @SWG\Parameter(
+     *         description="用户id",
+     *         in="query",
+     *         name="user_id",
+     *         required=true,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         description="用户token",
+     *         in="query",
+     *         name="token",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         description="消息ID",
+     *         in="query",
+     *         name="message_id",
+     *         required=true,
+     *         type="integer",
+     *     ),
+     *     @SWG\Response (
+     *          response="200",
+     *          description="查询成功！",
+     *          @SWG\Schema(
+	 *              @SWG\Property(
+	 *                  property="status",
+	 *                  type="number",
+	 *                  description="状态码"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="msg",
+	 *                  type="string",
+	 *                  description="提示信息"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="data",
+	 *                  type="object",
+ *                 	    @SWG\Property(
+ *                 	    	property="title",
+ *                       	type="number",
+ *                       	description="消息title"
+ *                 	    ),
+ *                 	    @SWG\Property(
+ *                 	    	property="content",
+ *                       	type="number",
+ *                       	description="消息内容"
+ *                 	    ),
+ *                 	    @SWG\Property(
+ *                 	    	property="link",
+ *                       	type="string",
+ *                       	description="消息活动链接"
+ *                 	    ),
+ *                 	    @SWG\Property(
+ *                 	    	property="sender",
+ *                       	type="string",
+ *                       	description="消息发送者"
+ *                 	    ),
+ *                 	    @SWG\Property(
+ *                 	    	property="created_at",
+ *                       	type="number",
+ *                       	description="消息创建时间"
+ *                 	    ),
+	 *              ),
+	 *          )
+	 *     )
+     * )
+     */
  	public function info(Request $request)
  	{
  		//定义返回格式数组
@@ -106,10 +247,83 @@ class MessageController extends Controller
  	}
 
  	/**
- 	 * 发送站内消息
- 	 * @param  Request $request [description]
- 	 * @return [type]           [description]
- 	 */
+     * @SWG\Post(
+     *     path="/api/message/send",
+     *     summary="发送站内消息",
+     *     produces={"application/json"},
+     *     tags={"Message"},
+     *     @SWG\Parameter(
+     *         description="用户id",
+     *         in="query",
+     *         name="user_id",
+     *         required=true,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         description="用户token",
+     *         in="query",
+     *         name="token",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         description="消息标题",
+     *         in="query",
+     *         name="title",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         description="消息发送者",
+     *         in="query",
+     *         name="sender",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         description="消息内容",
+     *         in="query",
+     *         name="content",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         description="消息活动链接",
+     *         in="query",
+     *         name="link",
+     *         required=true,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         description="接受的用户ids",
+     *         in="query",
+     *         name="receiver_ids",
+     *         required=true,
+     *         type="string",
+     *         description="用户id字符串，多个用户英文逗号隔开,例如1,2,3,4",
+     *     ),
+     *     @SWG\Response (
+     *          response="200",
+     *          description="发送成功！",
+     *          @SWG\Schema(
+	 *              @SWG\Property(
+	 *                  property="status",
+	 *                  type="number",
+	 *                  description="状态码"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="msg",
+	 *                  type="string",
+	 *                  description="提示信息"
+	 *              ),
+	 *              @SWG\Property(
+	 *                  property="data",
+	 *                  type="string",
+	 *              ),
+	 *          )
+	 *     )
+     * )
+     */
  	public function send(Request $request)
  	{
  		//定义返回格式数组
