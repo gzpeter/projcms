@@ -67,49 +67,54 @@ class ArticleController extends Controller
      *                      type="object",
      *                      @SWG\Property(
      *                          property="id",
-     *                            type="number",
-     *                            description="文章ID"
+     *                          type="number",
+     *                          description="文章ID"
+     *                      ),
+     *                      @SWG\Property(
+     *                          property="type",
+     *                          type="number",
+     *                          description="文章类型"
+     *                      ),
+     *                      @SWG\Property(
+     *                          property="status",
+     *                          type="number",
+     *                          description="文章状态"
+     *                      ),
+     *                      @SWG\Property(
+     *                          property="title",
+     *                          type="string",
+     *                          description="文章标题"
+     *                      ),
+     *                      @SWG\Property(
+     *                          property="author",
+     *                          type="string",
+     *                          description="文章作者"
      *                      ),
      *                         @SWG\Property(
-     *                             property="type",
-     *                           type="number",
-     *                           description="文章类型"
-     *                         ),
-     *                         @SWG\Property(
-     *                             property="status",
-     *                           type="number",
-     *                           description="文章状态"
-     *                         ),
-     *                         @SWG\Property(
-     *                             property="title",
-     *                           type="string",
-     *                           description="文章标题"
-     *                         ),
-     *                         @SWG\Property(
-     *                             property="author",
-     *                           type="string",
-     *                           description="文章作者"
-     *                         ),
-     *                         @SWG\Property(
-     *                             property="read_num",
-     *                           type="number",
-     *                           description="文章阅读数"
-     *                         ),
-     *                         @SWG\Property(
-     *                             property="collect_num",
-     *                           type="number",
-     *                           description="文章收藏数"
-     *                         ),
-     *                         @SWG\Property(
-     *                             property="update_time",
-     *                           type="string",
-     *                           description="文章更新时间"
-     *                         ),
+     *                          property="read_num",
+     *                          type="number",
+     *                          description="文章阅读数"
+     *                      ),
+     *                      @SWG\Property(
+     *                          property="collect_num",
+     *                          type="number",
+     *                          description="文章收藏数"
+     *                      ),
+     *                      @SWG\Property(
+     *                          property="update_time",
+     *                          type="string",
+     *                          description="文章更新时间"
+     *                      ),
      *                  ),
      *                  @SWG\Property(
      *                      property="pages",
      *                      type="number",
      *                      description="总页数"
+     *                  ),
+     *                  @SWG\Property(
+     *                      property="is_next",
+     *                      type="number",
+     *                      description="是否显示下一等级内容（0 不显示；1 显示，默认为0）"
      *                  ),
      *              ),
      *          )
@@ -125,7 +130,7 @@ class ArticleController extends Controller
             'data'   => [
                 'pages' => 0,
                 'lists' => [],
-                'next_list' =>[],
+                'is_next' =>0,
             ],
         ];
         //检测需要的参数是否传递
@@ -195,17 +200,9 @@ class ArticleController extends Controller
         ];
         $read_num = ArticleRead::where($read_where)->count();
 
-        $next_list = [];
+        $is_next = 0;
         if($read_num >= 40){
-            if($orwhere){
-                $next_list = Article::where($where)->where(function($query) use ($orwhere){
-                    foreach ($orwhere as $key => $value) {
-                        $query->orwhere($value[0],$value[1],$value[2]);
-                    }
-                })->select($field)->limit($size)->orderBy('id', 'desc')->get();
-            }else{
-                $next_list = Article::where($where)->select($field)->limit($size)->orderBy('id', 'desc')->get();
-            }
+            $is_next = 1;
         }
 
         //获取总页数
@@ -217,7 +214,7 @@ class ArticleController extends Controller
         }
         $ret['data']['lists'] = $lists;
         $ret['data']['pages'] = $pages;
-        $ret['data']['next_list'] = $next_list;
+        $ret['data']['is_next'] = $is_next;
         return $ret;
     }
 
