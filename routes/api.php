@@ -35,6 +35,8 @@ Route::group(['prefix'=>'index','namespace'=>'Index'],function(){
 	Route::post('/article/list', 'ArticleController@lists');
 	//文章详情
 	Route::post('/article/info', 'ArticleController@info');
+	//
+	Route::post('/article/content_tag','ArticleController@content_tag');
 	//搜索
 	Route::post('/search/list','SearchController@lists');
 	//收藏列表

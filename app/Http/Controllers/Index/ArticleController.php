@@ -125,10 +125,11 @@ class ArticleController extends Controller
             'data'   => [
                 'pages' => 0,
                 'lists' => [],
+                'next_list' =>[],
             ],
         ];
         //检测需要的参数是否传递
-        $param = ['page','level'];
+        $param = ['page','level','user_tag'];
         foreach ($param as $key => $value) {
             if (!$request->input($value)) {
                 $ret['status'] = -1;
@@ -136,7 +137,6 @@ class ArticleController extends Controller
                 return $ret;
             }
         }
-
         if (!$this->user_id) {
             $ret['status'] = -1000;
             $ret['msg']    = '用户未登录！';
@@ -169,7 +169,7 @@ class ArticleController extends Controller
         if($content_tag){
             $where[] = ['content_tag_word','like','%;'.$content_tag.'%'];
         }
-       
+        $where[] = ['status','=',1];
         //需要查询的列
         $field = ['id', 'type', 'status', 'title', 'author', 'read_num', 'collect_num', 'last_update_time'];
         //获取符合条件数据
@@ -188,6 +188,26 @@ class ArticleController extends Controller
         }
         //获取符合条件总条数
         $count = Article::where($where)->count();
+
+        $read_where = [
+            ['user_id','=',$this->user_id],
+            ['article_level','=',$level],
+        ];
+        $read_num = ArticleRead::where($read_where)->count();
+
+        $next_list = [];
+        if($read_num >= 40){
+            if($orwhere){
+                $next_list = Article::where($where)->where(function($query) use ($orwhere){
+                    foreach ($orwhere as $key => $value) {
+                        $query->orwhere($value[0],$value[1],$value[2]);
+                    }
+                })->select($field)->limit($size)->orderBy('id', 'desc')->get();
+            }else{
+                $next_list = Article::where($where)->select($field)->limit($size)->orderBy('id', 'desc')->get();
+            }
+        }
+
         //获取总页数
         $pages = ceil($count / $size);
         //格式化数据
@@ -197,6 +217,7 @@ class ArticleController extends Controller
         }
         $ret['data']['lists'] = $lists;
         $ret['data']['pages'] = $pages;
+        $ret['data']['next_list'] = $next_list;
         return $ret;
     }
 
@@ -326,7 +347,7 @@ class ArticleController extends Controller
         //定义变量
         $article_id = $request->input('article_id');
 
-        $field = ['id', 'type', 'status', 'title', 'author', 'read_num', 'collect_num', 'last_update_time'];
+        $field = ['id', 'type', 'status', 'title', 'author', 'read_num','content_level_id','collect_num', 'last_update_time'];
         $info  = Article::select($field)->find($article_id);
         if (!$info) {
             return $ret;
@@ -345,6 +366,7 @@ class ArticleController extends Controller
                 $time                     = time();
                 $data['user_id']          = $this->user_id;
                 $data['article_id']       = $article_id;
+                $data['article_level']    = $info['content_level_id'];
                 $data['last_update_time'] = $time;
                 $data['created_at']       = $time;
                 DB::table('article_read')->insertGetId($data);
@@ -354,6 +376,114 @@ class ArticleController extends Controller
             $ret['status'] = -2;
             $ret['msg']    = '更新阅读数失败！' . $e->getMessage();
         }
+        return $ret;
+    }
+
+
+    /**
+     * @SWG\Post(
+     *     path="/api/index/article/content_tag",
+     *     summary="前端用户-获取内容标签列表",
+     *     produces={"application/json"},
+     *     tags={"Article"},
+     *     @SWG\Parameter(
+     *         name="user_tag",
+     *         type="string",
+     *         description="用户标签",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="level",
+     *         type="integer",
+     *         description="用户知识等级",
+     *         required=true,
+     *         in="query",
+     *     ),
+     *     @SWG\Response (
+     *          response="200",
+     *          description="查询成功！",
+     *          @SWG\Schema(
+     *              @SWG\Property(
+     *                  property="status",
+     *                  type="number",
+     *                  description="状态码"
+     *              ),
+     *              @SWG\Property(
+     *                  property="msg",
+     *                  type="string",
+     *                  description="提示信息"
+     *              ),
+     *              @SWG\Property(
+     *                  property="data",
+     *                  type="object",
+     *                  @SWG\Property(
+     *                      property="lists",
+     *                      type="array",
+     *                  ),
+     *                  @SWG\Property(
+     *                      property="pages",
+     *                      type="number",
+     *                      description="总页数"
+     *                  ),
+     *              ),
+     *          )
+     *     ),
+     * )
+     */
+    public function content_tag(Request $request)
+    {
+        //定义返回格式数组
+        $ret = [
+            'status' => 0,
+            'msg'    => '查询成功！',
+            'data'   => [
+                'lists' => [],
+            ],
+        ];
+        //检测需要的参数是否传递
+        $param = ['level','user_tag'];
+        foreach ($param as $key => $value) {
+            if (!$request->input($value)) {
+                $ret['status'] = -1;
+                $ret['msg']    = $value . '参数错误！';
+                return $ret;
+            }
+        }
+        if (!$this->user_id) {
+            $ret['status'] = -1000;
+            $ret['msg']    = '用户未登录！';
+            return $ret;
+        }
+        $type = $request->input('type', '');
+        if ($type) {
+            $where[] = ['type', '=', $type];
+        }
+
+        $user_tag = $request->input('user_tag');
+        $level = $request->input('level',1);
+        $orwhere = [];
+        if($user_tag){
+            $where[] = ['content_level_id','=',$level];
+            $tag_arr = explode(';',$user_tag);
+            foreach ($tag_arr as $key => $value) {
+                $orwhere[] = ['user_tag_word','like','%;'.$value.'%'];
+            }
+        }
+        //需要查询的列
+        $field = ['id', 'type', 'status', 'title', 'author', 'read_num', 'collect_num', 'last_update_time'];
+        //获取符合条件数据
+
+        $content_lists = Article::where($where)->orwhere($orwhere)->select(['content_tag_word'])->get();
+        $c_list = [];
+        if($content_lists){
+            if($content_lists){
+                foreach ($content_lists as $key => $value) {
+                    $c_list = array_unique(array_merge($c_list,array_filter(explode(';',$value['content_tag_word']))));
+                }
+            }
+        }
+        $ret['data']['lists'] = $c_list;
         return $ret;
     }
 }
