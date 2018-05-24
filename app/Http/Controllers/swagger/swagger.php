@@ -26,5 +26,13 @@
  *     name="Collection", 
  *     description="收藏操作", 
  *   ), 
+ *   @SWG\Tag( 
+ *     name="Tags", 
+ *     description="标签操作", 
+ *   ), 
+ *   @SWG\Tag( 
+ *     name="Search", 
+ *     description="搜索操作", 
+ *   ), 
  * ) 
  */  
