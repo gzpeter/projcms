@@ -32,23 +32,25 @@ Route::prefix('tags')->group(function(){
 //前台用户访问路由
 Route::group(['prefix'=>'index','namespace'=>'Index'],function(){
 	//文章列表
-	Route::post('/article/list', 'ArticleController@lists');
+	Route::post('article/list', 'ArticleController@lists');
 	//文章详情
-	Route::post('/article/info', 'ArticleController@info');
+	Route::post('article/info', 'ArticleController@info');
 	//
-	Route::post('/article/content_tag','ArticleController@content_tag');
+	Route::post('article/content_tag','ArticleController@content_tag');
 	//搜索
-	Route::post('/search/list','SearchController@lists');
+	Route::post('search/list','SearchController@lists');
 	//收藏列表
-	Route::post('/collection/list', 'CollectionController@lists');
+	Route::post('collection/list', 'CollectionController@lists');
 	//添加收藏
-	Route::post('/collection/add', 'CollectionController@add');
+	Route::post('collection/add', 'CollectionController@add');
 	//删除收藏
-	Route::post('/collection/delete', 'CollectionController@delete');
+	Route::post('collection/delete', 'CollectionController@delete');
 	//消息列表
-    Route::post('/message/list','MessageController@lists');
+    Route::post('message/list','MessageController@lists');
     //消息详情
-    Route::post('/message/info', 'MessageController@info');
+    Route::post('message/info', 'MessageController@info');
+    //
+    Route::post('article/isUnderstand','ArticleController@isUnderstand');
 });
 
 //后台用户访问路由

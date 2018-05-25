@@ -29,15 +29,15 @@ class Controller extends BaseController
      * @return [type]           [description]
      */
     public function check_token(Request $request){
-    	//$token = $request->header('token');
     	$token = $request->header('token');
+        $client_id = 'b2213a4e-fe9f-42be-a37d-fb5e474cf488';
+        $client_secret = 'btI50XAmxBE=';
     	$functions = new Functions;
     	$url = 'http://auc.haalthy.com/v1/oauth/check_token';
-    	$post_data = [];
-        $header = [
+    	$data = [
             'token' => $token,
         ];
-    	$json_str = $functions->postUrl($url,$header);
+    	$json_str = $functions->postUrl($url,$client_id,$client_secret,$data);
     	$res = json_decode($json_str,true);
         $this->user_id = $res['user_id'] ?? 0;
         $this->user_name = $res['user_name'] ?? '';
