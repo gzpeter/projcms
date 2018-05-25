@@ -55,7 +55,7 @@ class ArticleController extends Controller
      *     @SWG\Parameter(
      *         name="type",
      *         type="integer",
-     *         description="内容形式",
+     *         description="内容类型（1：图文，2：视频，3音频，选填）",
      *         required=true,
      *         in="query",
      *     ),
@@ -119,6 +119,16 @@ class ArticleController extends Controller
      *                           type="string",
      *                           description="文章更新时间"
      *                         ),
+     *                         @SWG\Property(
+     *                             property="content_level_id",
+     *                           type="number",
+     *                           description="文章等级ID"
+     *                         ),
+     *                         @SWG\Property(
+     *                             property="medical_tag_word",
+     *                           type="string",
+     *                           description="医学标签"
+     *                         ),
      *                  ),
      *                  @SWG\Property(
      *                      property="pages",
@@ -139,6 +149,7 @@ class ArticleController extends Controller
             'data'   => [
                 'pages' => 0,
                 'lists' => [],
+                'total' => 0,
             ],
         ];
         //检测需要的参数是否传递
@@ -177,7 +188,6 @@ class ArticleController extends Controller
                 $orwhere[] = ['user_tag_word','like','%;'.$value.'%'];
             }
         }
-        
         if ($type) {
             $where[] = ['type', '=', $type];
         }
@@ -198,7 +208,7 @@ class ArticleController extends Controller
             $where[] = ['type', '=', trim($search_query)];
         }
         //需要查询的列
-        $field = ['id', 'type', 'status', 'title', 'author', 'read_num', 'collect_num', 'last_update_time'];
+        $field = ['id', 'type', 'status', 'title', 'author', 'content_level_id','medical_tag_word','read_num', 'collect_num', 'last_update_time'];
         //获取符合条件数据
         if($orwhere){
             $lists = Article::where($where)->where(function($query) use ($orwhere){
@@ -209,7 +219,6 @@ class ArticleController extends Controller
         }else{
             $lists = Article::where($where)->select($field)->offset($offsize)->limit($size)->orderBy('id', 'desc')->get();
         }
-        
         
         if (!$lists) {
             return $ret;
@@ -225,6 +234,7 @@ class ArticleController extends Controller
         }
         $ret['data']['lists'] = $lists;
         $ret['data']['pages'] = $pages;
+        $rrt['data']['total'] = $count;
         return $ret;
     }
 

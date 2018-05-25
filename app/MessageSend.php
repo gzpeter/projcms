@@ -13,5 +13,10 @@ class MessageSend extends Model
 	public $table = 'message_send';
 	
 	public $timestamps = false;
+
+	public function messageList()
+	{
+		$this->belongsTo('App\Message');
+	}
 }
 ?>

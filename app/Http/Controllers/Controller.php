@@ -30,14 +30,14 @@ class Controller extends BaseController
      */
     public function check_token(Request $request){
     	//$token = $request->header('token');
-    	$token = $request->header('_token');
-        echo $token;
+    	$token = $request->header('token');
     	$functions = new Functions;
-    	$url = 'www.com/ceshi.php';
-    	$post_data = [
-    		'token' => '2',
-    	];
-    	$json_str = $functions->postUrl($url,$post_data);
+    	$url = 'http://auc.haalthy.com/v1/oauth/check_token';
+    	$post_data = [];
+        $header = [
+            'token' => $token,
+        ];
+    	$json_str = $functions->postUrl($url,$header);
     	$res = json_decode($json_str,true);
         $this->user_id = $res['user_id'] ?? 0;
         $this->user_name = $res['user_name'] ?? '';

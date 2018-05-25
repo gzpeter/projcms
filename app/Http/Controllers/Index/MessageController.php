@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Index;
 
 use App\Http\Controllers\Controller;
 use App\Message;
+use App\MessageSend;
 use DB;
 use Illuminate\Http\Request;
 
@@ -80,8 +81,9 @@ class MessageController extends Controller
             'status' => 0,
             'msg'    => '查询成功！',
             'data'   => [
-                'pages' => 0,
+                'pages' => 1,
                 'lists' => [],
+                'total' => 0,
             ],
         ];
         //检测需要的参数是否传递
@@ -101,24 +103,25 @@ class MessageController extends Controller
         }
 
         $page = $request->input('page', 1);
-
         //查询条件
-        /*$where = [
-        ['message_send.user_id','=',$user_id]
-        ];*/
+        $where = [
+            ['user_id','=',$this->user_id],
+        ];
         //需要查询的列
         $field   = ['id', 'title', 'sender', 'created_at'];
         $size    = 10;
         $offsize = ($page - 1) * $size;
 
-        $lists = Message::select($field)->offset($offsize)->limit($size)->orderBy('id', 'desc')->get();
+        $lists = MessageSend::where($where)->offset($offsize)->limit($size)->orderBy('id', 'desc')->get();
+        //$lists = Message::select($field)->offset($offsize)->limit($size)->orderBy('id', 'desc')->get();
         foreach ($lists as $key => $value) {
             $lists[$key]['created_at'] = date('Y-m-d H:i:s', $value['created_at']);
         }
-        $count                = Message::count();
+        $count                = MessageSend::where($where)->count();
         $pages                = ceil($count / $size);
         $ret['data']['pages'] = $pages;
         $ret['data']['lists'] = $lists;
+        $ret['data']['total'] = $count;
         return $ret;
     }
 
@@ -212,6 +215,12 @@ class MessageController extends Controller
             ['id', '=', $message_id],
         ];
 
+        $info = MessageSend::where([['user_id','=',$this->user_id],['message_id','=',$message_id]])->select(['id','is_read'])->first();
+        if(!$info){
+            $ret['status'] = -2;
+            $ret['msg'] = '没有该消息通知！';
+            return $ret;
+        }
         //需要查询的列
         $field = [
             'title',
@@ -220,8 +229,12 @@ class MessageController extends Controller
             'sender',
             'last_update_time',
         ];
-        $info                = Message::where($where)->select($field)->first();
-        $ret['dara']['info'] = $info;
+        $message_info                = Message::where($where)->select($field)->first();
+        $ret['dara']['info'] = $message_info;
+        //如果该消息是未读状态 则改为已读状态
+        if(!$info['is_read']){
+            MessageSend::where([['user_id','=',$this->user_id],['message_id','=',$message_id]])->update(['is_read'=>1]);
+        }
         return $ret;
     }
 }
